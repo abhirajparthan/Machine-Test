@@ -1,7 +1,7 @@
 # Machine-Test- Output with all steps and commands
 
 ###### 1st Step
-I have created a new 3 instance for configurung the docker and swarm, These instances are Ubuntu and the Version is 20.04. I have used 1 instance for Master and other 2 for worker nodes.
+I have created a new 3 instance in AWS account for configurung the docker and swarm, These instances are Ubuntu and the Version is 20.04. I have used 1 instance for Master and other 2 for worker nodes.
 
 ![Screenshot from 2024-02-16 17-04-59](https://github.com/abhirajparthan/Machine-Test/assets/100773790/d5cc96f2-ae98-4adf-aab5-ad85d2b23f26)
 
@@ -63,4 +63,18 @@ docker swarm join-token worker
 
 ----
 
+  ##### 1. MySQL service with volume.
 
+Setuping a volume. I have created EFS service in AWS ( Its similaer to NFS ) and it mounted to one server for creating the 2 folders for mysql and web.
+
+![Screenshot from 2024-02-16 20-02-47](https://github.com/abhirajparthan/Machine-Test/assets/100773790/d86232fc-3632-4dff-864f-587c44387995)
+
+
+
+
+
+
+
+
+
+  
