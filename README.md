@@ -39,7 +39,10 @@ docker swarm init
 
 ![Screenshot from 2024-02-16 17-44-51](https://github.com/abhirajparthan/Machine-Test/assets/100773790/2d8962d4-b10b-4293-97d4-70cb1e2086dc)
 
-
+You can create the worker tocken after the 10 days using the below command.
+~~~
+docker swarm join-token worker
+~~~
 
 
 
