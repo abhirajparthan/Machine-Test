@@ -57,5 +57,10 @@ docker swarm join-token worker
 ~~~
 -----
 
+##### 3ed Step
+
+# 2. Deploy a simple docker stack which contains two services (use compose file). 
+
+----
 
 
