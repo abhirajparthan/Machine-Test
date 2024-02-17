@@ -69,6 +69,10 @@ Setup a volume. I have created EFS service in AWS ( Its similaer to NFS ) and it
 
 ![Screenshot from 2024-02-17 10-17-21](https://github.com/abhirajparthan/Machine-Test/assets/100773790/68231631-7ea7-48f7-85dd-15984e58554f)
 
+Then Created a 2 folders in the efs. The folder names are mysql and web. 
+
+![Screenshot from 2024-02-17 10-24-39](https://github.com/abhirajparthan/Machine-Test/assets/100773790/c6b3233f-cdd7-48cc-abc1-9482bfa859bd)
+
 ( Here Master node keep as master, I will not initiate to deploy the containers in the master node. So I drain the IP from the cluster )
 
 ~~~
@@ -77,8 +81,43 @@ docker node update --availability drain ip-172-31-20-123
 
 ![Screenshot from 2024-02-17 10-20-49](https://github.com/abhirajparthan/Machine-Test/assets/100773790/6d3ce446-c8de-478d-82db-e7b2005a1381)
 
+-------
+
+For deploying the stack . I have created a folder flask_app in the manager node and created a docker-compose.yml file inside the folder. Here I am using mysql:5.6 image for database. Also I mounted the container /var/lib/mysql to efs folder( Here I am using bind mount. ). 
+~~~
+vi docker-compose.yml
+
+---
+
+version: '3.8'
+
+services:
+
+  database:
+    image: mysql:5.6
+    networks:
+       - flask_net
+    volumes:
+      - type: bind
+        source: /root/volume/mount/mysql
+        target: /var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: qwerty123!
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    deploy:
+      replicas: 1
 
 
+
+networks:
+  flask_net:
+    driver: overlay
+
+volumes:
+  mysql_data:
+~~~
 
 
 
