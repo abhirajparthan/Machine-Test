@@ -333,8 +333,11 @@ We can see that the out put is below.
 
 ![Screenshot from 2024-02-17 22-00-14](https://github.com/abhirajparthan/Machine-Test/assets/100773790/1b2b2574-401a-48ff-9cef-0bd0bc4d8adf)
 
+This Outpot is Similar to the databse table. We can confirm the database is connected to the flask application
 
+-----
 
+# Deploy another docker stack with traefik service. The request for the above app should be load balance through traefik service.
 
 
   
