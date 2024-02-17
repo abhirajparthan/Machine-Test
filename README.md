@@ -69,6 +69,7 @@ Setuping a volume. I have created EFS service in AWS ( Its similaer to NFS ) and
 
 ![Screenshot from 2024-02-16 20-02-47](https://github.com/abhirajparthan/Machine-Test/assets/100773790/d86232fc-3632-4dff-864f-587c44387995)
 
+Here we can mount mysql folder to /var/lib/mysql of the mysql container. Also we can mount the web folder forflask application
 
 
 
