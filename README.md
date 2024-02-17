@@ -77,7 +77,7 @@ Then Created a 1 folders in the efs. The folder names is mysql.
 docker node update --availability drain ip-172-31-20-123
 ~~~
 
-![Screenshot from 2024-02-17 10-20-49](https://github.com/abhirajparthan/Machine-Test/assets/100773790/6d3ce446-c8de-478d-82db-e7b2005a1381)
+![Screenshot from 2024-02-17 21-51-52](https://github.com/abhirajparthan/Machine-Test/assets/100773790/e401e66e-35f6-4c37-98a5-08ff51c5ad91)
 
 -------
 
@@ -131,7 +131,7 @@ networks:
 
 I have deployed the stack using the command, My stack name in myflask
 ~~~
-docker stack deploy -c docker-compose.yml myflask
+docker stack deploy -c docker-compose.yml abhi
 ~~~
 
 After the deploying I have check the mysql replica using command 
@@ -339,5 +339,10 @@ This Outpot is Similar to the databse table. We can confirm the database is conn
 
 # Deploy another docker stack with traefik service. The request for the above app should be load balance through traefik service.
 
+I have created a folder for traefic and created a docker-compose.yml file for stack creation
+
+~~~
+
+~~~
 
   
