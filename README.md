@@ -119,6 +119,29 @@ volumes:
   mysql_data:
 ~~~
 
+I have deployed the stack using the command, My stack name in myflask
+~~~
+docker stack deploy -c docker-compose.yml myflask
+~~~
+
+After the deploying I have check the mysql replica using command 
+~~~
+docker service ls
+~~~
+
+![Screenshot from 2024-02-17 12-29-29](https://github.com/abhirajparthan/Machine-Test/assets/100773790/58825c2b-3ebe-4341-8a6c-db9d4d81c5fe)
+
+
+Also I cloginto the container and checked the database and user name created depends on the env, Its created 
+
+![Screenshot from 2024-02-17 12-14-28](https://github.com/abhirajparthan/Machine-Test/assets/100773790/3dc8540e-bd54-4d01-8149-9c451ce4181f)
+
+Then checked the volume is mounted properly. Checked the mounted path /root/volume/mount/mysql I can see that the mounted files in the location.
+
+![Screenshot from 2024-02-17 12-17-08](https://github.com/abhirajparthan/Machine-Test/assets/100773790/1b424e60-cf84-45bd-9af1-23eb80509153)
+
+
+
 
 
 
