@@ -166,7 +166,7 @@ def employee_data():
     config = {
         'user': 'wordpress',
         'password': 'wordpress',
-        'host': 'db',
+        'host': 'database',
         'port': '3306',
         'database': 'wordpress'
     }
@@ -230,6 +230,13 @@ Then I uploaded the docker image to docker hub. ( Changed the tag, login to the 
 
 ------------
 
+For the database connectivity check I have imported table and table details to the mysql database. 
+
+![Screenshot from 2024-02-17 14-04-24](https://github.com/abhirajparthan/Machine-Test/assets/100773790/f8b43784-46d8-4f99-ab30-34ca269f40b5)
+
+Then modified the exsisting docker-compose.yml for the flask application
+
+~~~
 
 
 
