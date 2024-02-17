@@ -146,6 +146,90 @@ Then checked the volume is mounted properly. Checked the mounted path /root/volu
 
   ----
   
+For building the Flask application I have created 3 files in the local directory. The files are app.py, requirement.txt, Dockerfile.
+
+![Screenshot from 2024-02-17 14-13-59](https://github.com/abhirajparthan/Machine-Test/assets/100773790/699bcee1-7272-490a-ac60-550faabfce2c)
+
+I have importe the code to app.py file: It connects to a MySQL database and retrieves data from the employee_data table. The data is returned as a JSON response when accessing the root URL.
+
+~~~
+vi app.py
+
+from flask import Flask, jsonify
+import mysql.connector
+
+
+app = Flask(__name__)
+
+
+def employee_data():
+    config = {
+        'user': 'wordpress',
+        'password': 'wordpress',
+        'host': 'db',
+        'port': '3306',
+        'database': 'wordpress'
+    }
+    connection = mysql.connector.connect(**config)
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('SELECT Employee_Name, Title FROM employee_data')
+    results = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return results
+
+
+@app.route('/')
+def index():
+    return jsonify({'Employee Data': employee_data()})
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
+~                                                                                                                                             
+~                                 
+~~~
+ 
+Then Import the requirement packages to requirement.txt
+~~~
+vi requirement.txt 
+
+Flask
+mysql-connector
+~~~
+
+Then I have writed the Dockerfile for building the docker Image.
+
+~~~
+vi Dockerimage
+
+FROM python:3.6
+
+WORKDIR /app
+
+COPY . /app
+
+RUN pip install -r requirements.txt
+
+EXPOSE 5000
+
+CMD python app.py
+~~~
+
+Then I build the Image using the command 
+
+~~~
+sudo docker image build -t flaskbhi:latest .
+~~~
+
+![Screenshot from 2024-02-17 14-21-35](https://github.com/abhirajparthan/Machine-Test/assets/100773790/e3faaf8d-b8ca-4b04-bf5b-26fafe5e2059)
+
+Then I uploaded the docker image to docker hub. ( Changed the tag, login to the hub and then pushed the latest image )
+
+![Screenshot from 2024-02-17 14-27-21](https://github.com/abhirajparthan/Machine-Test/assets/100773790/4a8c04d3-4d33-4803-b3eb-9fddc904ef61)
+
+------------
+
 
 
 
