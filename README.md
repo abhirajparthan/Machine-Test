@@ -1,10 +1,9 @@
 # Machine-Test- Output with all steps and commands
 
 ###### 1st Step
-I have created a new 3 instance in AWS account for configurung the docker and swarm, These instances are Ubuntu and the Version is 20.04. I have used 1 instance for Master and other 2 for worker nodes.
+I have created a new 4 instance in AWS account for configurung the docker and swarm, These instances are Ubuntu and the Version is 20.04. I have used 1 instance for Master and other 3 for worker nodes.
 
-![Screenshot from 2024-02-16 17-04-59](https://github.com/abhirajparthan/Machine-Test/assets/100773790/d5cc96f2-ae98-4adf-aab5-ad85d2b23f26)
-
+![Screenshot from 2024-02-17 21-50-35](https://github.com/abhirajparthan/Machine-Test/assets/100773790/7ac8f8a9-7134-4ff6-b436-183116afb0b2)
 
 ----
 
@@ -47,8 +46,7 @@ Then We can see the worker nodes and master nodes using the command.
 docker node ls
 ~~~
 
-![Screenshot from 2024-02-16 18-00-30](https://github.com/abhirajparthan/Machine-Test/assets/100773790/f22c950b-d59b-4a23-8e5a-1faaf0c8c0a4)
-
+![Screenshot from 2024-02-17 21-51-52](https://github.com/abhirajparthan/Machine-Test/assets/100773790/d2097ec0-ce89-4623-b422-09c6b9c32f16)
 
 -----
 You can create the worker tocken after the 10 days using the below command.
@@ -69,7 +67,7 @@ Setup a volume. I have created EFS service in AWS ( Its similaer to NFS ) and it
 
 ![Screenshot from 2024-02-17 10-17-21](https://github.com/abhirajparthan/Machine-Test/assets/100773790/68231631-7ea7-48f7-85dd-15984e58554f)
 
-Then Created a 2 folders in the efs. The folder names are mysql and web. 
+Then Created a 1 folders in the efs. The folder names is mysql. 
 
 ![Screenshot from 2024-02-17 10-24-39](https://github.com/abhirajparthan/Machine-Test/assets/100773790/c6b3233f-cdd7-48cc-abc1-9482bfa859bd)
 
@@ -83,7 +81,7 @@ docker node update --availability drain ip-172-31-20-123
 
 -------
 
-For deploying the stack . I have created a folder flask_app in the manager node and created a docker-compose.yml file inside the folder. Here I am using mysql:5.6 image for database. Also I mounted the container /var/lib/mysql to efs folder( Here I am using bind mount. ). 
+For deploying the stack . I have created a folder flask_app in the manager node and created a docker-compose.yml file inside the folder. Here I am using mysql:5.6 image for database. Also I mounted the container /var/lib/mysql to efs folder( Here I am using bind mount. ).  Also I have aded the resource label of 2 nodes is flask and 1 is mysql
 ~~~
 vi docker-compose.yml
 
@@ -106,17 +104,29 @@ services:
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
+    ports:
+      - "3306:3306"
     deploy:
       replicas: 1
-
-
+      placement:
+        constraints:
+          - node.labels.resource == mysql
+    networks:
+      flask_net:
+    healthcheck:
+      test: "mysqladmin ping -h 127.0.0.1 -u root --password=qwerty123! || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 networks:
   flask_net:
     driver: overlay
-
-volumes:
-  mysql_data:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/24
 ~~~
 
 I have deployed the stack using the command, My stack name in myflask
@@ -166,7 +176,7 @@ def employee_data():
     config = {
         'user': 'wordpress',
         'password': 'wordpress',
-        'host': 'database',
+        'host': '172.31.27.71', #added Private IP of the server
         'port': '3306',
         'database': 'wordpress'
     }
@@ -237,7 +247,91 @@ For the database connectivity check I have imported table and table details to t
 Then modified the exsisting docker-compose.yml for the flask application
 
 ~~~
+vi docker-compose.yml
 
+---
+
+version: '3.8'
+
+services:
+
+  database:    
+    image: mysql:5.6    
+    networks:
+       - flask_net
+    volumes:
+      - type: bind
+        source: /root/volume/mount/mysql
+        target: /var/lib/mysql    
+    environment:
+      MYSQL_ROOT_PASSWORD: qwerty123!
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    ports:
+      - "3306:3306"
+    deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - node.labels.resource == mysql
+    networks:
+      flask_net:
+    healthcheck:
+      test: "mysqladmin ping -h 127.0.0.1 -u root --password=qwerty123! || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  flask:
+    image: aparthan/flask_machine:latest
+    networks:
+      - flask_net
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+    deploy:
+      replicas: 7
+      placement:
+        constraints:
+          - node.labels.resource == flask
+
+networks:
+  flask_net:
+    driver: overlay
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/24
+
+
+volumes:
+  mysql_data:
+  web_data:
+~~~
+
+After the I have deployed the flask application with mysql usig the command 
+
+![Screenshot from 2024-02-17 21-57-49](https://github.com/abhirajparthan/Machine-Test/assets/100773790/7984e621-2170-416e-9b45-c00cadf5f989)
+
+Then I have checked the services using the command 
+
+![Screenshot from 2024-02-17 22-01-30](https://github.com/abhirajparthan/Machine-Test/assets/100773790/056e6726-e555-4625-ab4d-784b42b2e4b1)
+
+
+Now the stack deployment is completed. We can acces the flask applicaton from the blow ip with port
+
+~~~
+http://3.14.6.225:5000/
+http://3.144.211.214:5000/
+~~~
+
+We can see that the out put is below.
+![Screenshot from 2024-02-17 22-00-07](https://github.com/abhirajparthan/Machine-Test/assets/100773790/5c55f21b-9ce1-4b9b-a9f0-924a0aa791de)
+
+![Screenshot from 2024-02-17 22-00-14](https://github.com/abhirajparthan/Machine-Test/assets/100773790/1b2b2574-401a-48ff-9cef-0bd0bc4d8adf)
 
 
 
