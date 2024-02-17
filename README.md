@@ -140,8 +140,12 @@ Then checked the volume is mounted properly. Checked the mounted path /root/volu
 
 ![Screenshot from 2024-02-17 12-17-08](https://github.com/abhirajparthan/Machine-Test/assets/100773790/1b424e60-cf84-45bd-9af1-23eb80509153)
 
+----
 
+  ##### 2. Simple app service (you can find some simple Flask apps from communities) which should connect to the above MySQL.
 
+  ----
+  
 
 
 
