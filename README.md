@@ -65,11 +65,19 @@ docker swarm join-token worker
 
   ##### 1. MySQL service with volume.
 
-Setuping a volume. I have created EFS service in AWS ( Its similaer to NFS ) and it mounted to one server for creating the 2 folders for mysql and web.
+Setup a volume. I have created EFS service in AWS ( Its similaer to NFS ) and it mounted to worker nodes. 
 
-![Screenshot from 2024-02-16 20-02-47](https://github.com/abhirajparthan/Machine-Test/assets/100773790/d86232fc-3632-4dff-864f-587c44387995)
+![Screenshot from 2024-02-17 10-17-21](https://github.com/abhirajparthan/Machine-Test/assets/100773790/68231631-7ea7-48f7-85dd-15984e58554f)
 
-Here we can mount mysql folder to /var/lib/mysql of the mysql container. Also we can mount the web folder forflask application
+( Here Master node keep as master, I will not initiate to deploy the containers in the master node. So I drain the IP from the cluster )
+
+~~~
+docker node update --availability drain ip-172-31-20-123
+~~~
+
+![Screenshot from 2024-02-17 10-20-49](https://github.com/abhirajparthan/Machine-Test/assets/100773790/6d3ce446-c8de-478d-82db-e7b2005a1381)
+
+
 
 
 
