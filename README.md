@@ -277,7 +277,7 @@ services:
     depends_on:
       - database
     deploy:
-      replicas: 4
+      replicas: 7
       placement:
         constraints:
           - node.labels.resource == flask
@@ -308,9 +308,10 @@ http://18.118.6.242:5000/
 
 We can see that the out put is below.
 
-![Screenshot from 2024-02-17 22-00-07](https://github.com/abhirajparthan/Machine-Test/assets/100773790/5c55f21b-9ce1-4b9b-a9f0-924a0aa791de)
+![Screenshot from 2024-02-18 14-25-36](https://github.com/abhirajparthan/Machine-Test/assets/100773790/580c491e-4bfd-4a67-b4fd-abbbd7bd2fac)
 
-![Screenshot from 2024-02-17 22-00-14](https://github.com/abhirajparthan/Machine-Test/assets/100773790/1b2b2574-401a-48ff-9cef-0bd0bc4d8adf)
+![Screenshot from 2024-02-18 14-25-42](https://github.com/abhirajparthan/Machine-Test/assets/100773790/44fbe938-1d9d-4585-b028-d917fc3b4fa9)
+
 
 This Outpot is Similar to the databse table. We can confirm the database is connected to the flask application
 
@@ -364,7 +365,7 @@ networks:
   traefik_net:
 
 ~~~
-I have mounted the nginx default configuration file to the efs volume and the default configuration file content is below. We can load balance the stack node here.
+I have mounted the nginx default configuration file to the efs volume and the default configuration file content is below. We can load balance the stack node here. Here we I am using the private IP for the node server for upstream
 
 ~~~
 upstream samplecluster {
