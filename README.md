@@ -402,7 +402,7 @@ I have try to access the domain abhiraj.ga with ports 8080 and 80 in the browser
 
 I got the application with url abhiraj.ga domain in the browser.
 
-![Screenshot from 2024-02-18 12-49-56](https://github.com/abhirajparthan/Machine-Test/assets/100773790/3c41f116-1737-4fa6-b5a0-27e06043ab2e)
+![Screenshot from 2024-02-18 14-21-59](https://github.com/abhirajparthan/Machine-Test/assets/100773790/e8fba90c-3f98-48b4-a980-d830367def80)
 
 
 -----------------
