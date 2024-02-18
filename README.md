@@ -46,7 +46,7 @@ Then We can see the worker nodes and master nodes using the command.
 docker node ls
 ~~~
 
-![Screenshot from 2024-02-17 21-51-52](https://github.com/abhirajparthan/Machine-Test/assets/100773790/d2097ec0-ce89-4623-b422-09c6b9c32f16)
+![Screenshot from 2024-02-18 15-11-42](https://github.com/abhirajparthan/Machine-Test/assets/100773790/a9340d24-60f2-4d76-bc63-f68459730e2e)
 
 -----
 You can create the worker tocken after the 10 days using the below command.
@@ -65,11 +65,11 @@ docker swarm join-token worker
 
 Setup a volume. I have created EFS service in AWS ( Its similaer to NFS ) and it mounted to worker nodes. 
 
-![Screenshot from 2024-02-17 10-17-21](https://github.com/abhirajparthan/Machine-Test/assets/100773790/68231631-7ea7-48f7-85dd-15984e58554f)
+![Screenshot from 2024-02-18 15-12-22](https://github.com/abhirajparthan/Machine-Test/assets/100773790/21801367-fb91-4780-b92a-09562b1c510f)
 
 Then Created a 1 folders in the efs. The folder names is mysql. 
 
-![Screenshot from 2024-02-17 10-24-39](https://github.com/abhirajparthan/Machine-Test/assets/100773790/c6b3233f-cdd7-48cc-abc1-9482bfa859bd)
+![Screenshot from 2024-02-18 15-14-03](https://github.com/abhirajparthan/Machine-Test/assets/100773790/ed937358-f28a-4567-a607-1621182d2ed3)
 
 -------
 
@@ -133,7 +133,7 @@ Also I checked the database and user name created insdie the container depends o
 
 Then checked the volume is mounted properly. Checked the mounted path /root/volume/mount/mysql I can see that the mounted files in the location.
 
-![Screenshot from 2024-02-17 12-17-08](https://github.com/abhirajparthan/Machine-Test/assets/100773790/1b424e60-cf84-45bd-9af1-23eb80509153)
+![Screenshot from 2024-02-18 15-14-45](https://github.com/abhirajparthan/Machine-Test/assets/100773790/ad900da4-afdb-4ee2-8a45-6838aa7f133c)
 
 ----
 
