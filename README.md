@@ -86,7 +86,7 @@ services:
   database:
     image: mysql:5.6
     networks:
-      - mysql_net
+      - flask_net
     volumes:
       - type: bind
         source: /root/volume/mount/mysql
