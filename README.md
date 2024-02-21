@@ -1,9 +1,9 @@
 # Machine-Test- Output with all steps and commands
 
 ###### 1st Step
-I have created a new 4 instance in AWS account for configurning the docker and swarm, These instances are Ubuntu and the Version is 20.04. I have used 1 instance for Master and other 3 for worker nodes.
+I have created a new 3 instance in AWS account for configurning the docker and swarm, These instances are Ubuntu and the Version is 20.04. I have used 1 instance for Master and other 2 for worker nodes.
 
-![Screenshot from 2024-02-17 21-50-35](https://github.com/abhirajparthan/Machine-Test/assets/100773790/7ac8f8a9-7134-4ff6-b436-183116afb0b2)
+![Screenshot from 2024-02-21 20-05-22](https://github.com/abhirajparthan/Machine-Test/assets/100773790/88c5a0c3-b80e-4ec3-a1a7-3281aee5c868)
 
 ----
 
@@ -11,7 +11,7 @@ I have created a new 4 instance in AWS account for configurning the docker and s
 
 # 1. Install docker and set up docker swarm.
 
-I have Installed the docker in 4 Instance using the below command. 
+I have Installed the docker in 3 Instance using the below command. 
 ~~~
 apt install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -46,7 +46,7 @@ Then We can see the worker nodes and master nodes using the command.
 docker node ls
 ~~~
 
-![Screenshot from 2024-02-18 15-11-42](https://github.com/abhirajparthan/Machine-Test/assets/100773790/a9340d24-60f2-4d76-bc63-f68459730e2e)
+![Screenshot from 2024-02-21 20-08-57](https://github.com/abhirajparthan/Machine-Test/assets/100773790/88530f97-31bb-4382-9321-65d36158de36)
 
 -----
 You can create the worker tocken after the 10 days using the below command.
@@ -111,8 +111,8 @@ services:
       start_period: 30s
 
 networks:
-  mysql_net:
-    driver: overlay
+  flask_net:
+    external: true
 ~~~
 
 I have deployed the stack using the command, My stack name in abhi
@@ -243,7 +243,7 @@ services:
   database:    
     image: mysql:5.7 
     networks:
-       - mysql_net
+      - flask_net
     volumes:
       - type: bind
         source: /root/volume/mount/mysql
@@ -271,22 +271,17 @@ services:
     image: aparthan/flask_machine:latest
     networks:
       - flask_net
-      - mysql_net
-    ports:
-      - "5000:5000"
     depends_on:
       - database
     deploy:
-      replicas: 7
+      replicas: 1
       placement:
         constraints:
-          - node.labels.resource == flask
+          - node.role == manager
 
 networks:
   flask_net:
-    driver: overlay
-  mysql_net:
-    driver: overlay
+  external: true
 
 ~~~
 
@@ -296,21 +291,12 @@ After the I have deployed the flask application with mysql usig the command
 
 Then I have checked the services using the command 
 
-![Screenshot from 2024-02-17 22-01-30](https://github.com/abhirajparthan/Machine-Test/assets/100773790/056e6726-e555-4625-ab4d-784b42b2e4b1)
+![Screenshot from 2024-02-21 20-24-44](https://github.com/abhirajparthan/Machine-Test/assets/100773790/2946570b-339f-46bd-bfc5-f206cac90866)
 
 
-Now the stack deployment is completed. We can acces the flask applicaton from the blow ip with port
+Now the stack deployment is completed. I have checked the connectivity of the flask and mysql from the Flask Docker. Its working
 
-~~~
-http://18.222.172.21:5000/
-http://18.118.6.242:5000/
-~~~
-
-We can see that the out put is below.
-
-![Screenshot from 2024-02-18 14-25-36](https://github.com/abhirajparthan/Machine-Test/assets/100773790/580c491e-4bfd-4a67-b4fd-abbbd7bd2fac)
-
-![Screenshot from 2024-02-18 14-25-42](https://github.com/abhirajparthan/Machine-Test/assets/100773790/44fbe938-1d9d-4585-b028-d917fc3b4fa9)
+![Screenshot from 2024-02-21 20-29-39](https://github.com/abhirajparthan/Machine-Test/assets/100773790/01aa9eb2-67c3-4de5-8de2-afe3b02840a1)
 
 
 This Outpot is Similar to the databse table. We can confirm the database is connected to the flask application
@@ -326,9 +312,7 @@ version: '3.8'
 
 services:
   traefik:
-    image: traefik:v2.5
-    networks:
-       - traefik_net
+    image: "traefik:v2.5"
     command:
       - "--api.insecure=true"
       - "--providers.docker.swarmMode=true"
@@ -336,57 +320,83 @@ services:
     ports:
       - "80:80"
       - "8080:8080"
+    networks:
+      - flask_net
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager 
+
+
+networks:
+  flask_net:
+    external: true
+~~~
+
+Also I modified the Flask and MySql docker-compose file for conectivity. The modified file is 
+
+~~~
+---
+
+version: '3.8'
+
+services:
+
+  database:    
+    image: mysql:5.7 
+    networks:
+       - flask_net
     volumes:
       - type: bind
-        source: /var/run/docker.sock
-        target: /var/run/docker.sock
-
+        source: /root/volume/mount/mysql
+        target: /var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: qwerty123!
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    ports:
+      - "3306:3306"
     deploy:
+      replicas: 1
+      placement:
+        constraints: 
+          - node.labels.resource == mysql
+    healthcheck:
+      test: "mysqladmin ping -h 127.0.0.1 -u root --password=qwerty123! || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  flask:
+    image: aparthan/flask_machine:latest
+    networks:
+      - flask_net
+    volumes:
+      - type: bind
+        source: /root/volume/mount/flask
+        target: /app
+    depends_on:
+      - database
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.flask.rule=Host(`abhiraj.ga`)"
+        - "traefik.http.services.flask.loadbalancer.server.port=5000"
       placement:
         constraints:
           - node.role == manager
 
-  web:
-    image: nginx:alpine
-    networks:
-       - traefik_net
-    volumes:
-      - type: bind
-        source: /root/volume/mount/web/default.conf
-        target: /etc/nginx/conf.d/default.conf 
-    deploy:
-      replicas: 3
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.myapp.rule=Host(`abhiraj.ga`)"
-        - "traefik.http.services.myapp.loadbalancer.server.port=80"
-
 networks:
-  traefik_net:
-
+  flask_net:
+    external: true
 ~~~
-I have mounted the nginx default configuration file to the efs volume and the default configuration file content is below. We can load balance the stack node here. Here we I am using the private IP for the node server for upstream
-
-~~~
-upstream samplecluster {
-  server 172.31.18.254:5000 weight=50;
-  server 172.31.26.85:5000 weight=50;
-}
-
-server {
-  listen 80;
-  server_name abhiraj.ga;
-
-  location / {
-    proxy_pass http://samplecluster;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-  }
-}
-~~~
-I have added my domain name as abhiraj.ga and its entry addded to my laptop /etc/hosts file. ( For accesing the domain in browser. )
+I have added my domain name as abhiraj.ga ias label under the flask service and the domain entry addded to my laptop /etc/hosts file. ( For accesing the domain in browser. )
 
 ![Screenshot from 2024-02-18 12-54-01](https://github.com/abhirajparthan/Machine-Test/assets/100773790/86e93248-f06e-46b1-9696-d66bb76164c9)
 
@@ -394,15 +404,19 @@ I have deployed the terafik stack using the below command.
 
 ![Screenshot from 2024-02-18 13-04-12](https://github.com/abhirajparthan/Machine-Test/assets/100773790/cb627cda-c5e2-4f85-9094-719e381098be)
 
-![Screenshot from 2024-02-18 13-04-47](https://github.com/abhirajparthan/Machine-Test/assets/100773790/5bdd5014-3d48-43f7-8fb5-52bab580f9fa)
+![Screenshot from 2024-02-21 20-35-54](https://github.com/abhirajparthan/Machine-Test/assets/100773790/779037e6-5673-409b-8935-28475895c021)
 
 I have try to access the domain abhiraj.ga with ports 8080 and 80 in the browser and I got the traefik dash board in abhiraj.ga:8080.
 
-![Screenshot from 2024-02-18 13-07-14](https://github.com/abhirajparthan/Machine-Test/assets/100773790/89dbfb06-ce27-40de-b08b-3dea54cb8361)
+![Screenshot from 2024-02-21 20-37-05](https://github.com/abhirajparthan/Machine-Test/assets/100773790/e40cc9b5-d76b-4e21-b971-8a25d6465089)
+
+![Screenshot from 2024-02-21 20-37-18](https://github.com/abhirajparthan/Machine-Test/assets/100773790/4d7c9c8d-5d1d-47ab-b8a5-362ba4508ca2)
+
+![Screenshot from 2024-02-21 20-37-30](https://github.com/abhirajparthan/Machine-Test/assets/100773790/38fb62e8-61a4-4ed3-94da-c81c0db2188d)
 
 I got the application with url abhiraj.ga domain in the browser.
 
-![Screenshot from 2024-02-18 14-21-59](https://github.com/abhirajparthan/Machine-Test/assets/100773790/e8fba90c-3f98-48b4-a980-d830367def80)
+![Screenshot from 2024-02-21 20-38-07](https://github.com/abhirajparthan/Machine-Test/assets/100773790/ede65bfa-b544-4c47-ab7c-cef6be0d55e8)
 
 
 -----------------
